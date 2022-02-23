@@ -1,0 +1,44 @@
+version: '3'
+services:
+    web:
+        image: t1
+        container_name: web
+        restart: always
+        user: application
+        environment:
+          #- WEB_ALIAS_DOMAIN=commerce.vengalavinay.com
+          - WEB_DOCUMENT_ROOT=/var/www/html
+          - MYSQL_USER=root
+          - MYSQL_PASSWORD=mysql123#
+          - MYSQL_HOST=test
+       # volumes:
+       #   - /root/magento-community:/app:cached
+        ports:
+          - "80:80"
+          - "443:443"
+          - "32823:22"
+	depends_on:
+	  - elasticsearch
+
+    elasticsearch:
+        container_name: elasticsearch
+        image: docker.elastic.co/elasticsearch/elasticsearch:7.8.1
+        environment:
+          - node.name=elasticsearch
+          - cluster.name=es-docker-cluster
+          - discovery.type=single-node
+          - bootstrap.memory_lock=true
+          - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+        ulimits:
+          memlock:
+            soft: -1
+            hard: -1
+        volumes:
+          - elasticserch:/usr/share/elasticsearch/data
+        ports:
+          - 9200:9200
+volumes:
+    magento-db-data:
+        external: false
+    magento-es-data:
+        external: false
